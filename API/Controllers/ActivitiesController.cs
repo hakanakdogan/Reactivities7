@@ -1,4 +1,5 @@
 ﻿using Application.Activities.Commands.CreateActivity;
+using Application.Activities.Commands.DeleteActivity;
 using Application.Activities.Commands.EditActivity;
 using Application.Activities.Queries.DetailActivity;
 using Application.Activities.Queries.ListActivities;
@@ -36,6 +37,12 @@ namespace API.Controllers
         {
             activity.Id = id;
             return Ok(await Mediator.Send(new EditActivityCommand.Command { Activity = activity }));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteActivity(Guid id)
+        {
+            return Ok(await Mediator.Send(new DeleteActivityCommand.Command { Id = id }));
         }
     }
 }

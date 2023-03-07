@@ -1,4 +1,5 @@
 using Application.Activities.Queries.ListActivities;
+using Application.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ListActivitiesQuery).Assembly));
+builder.Services.AddAutoMapper(typeof(MappingProfiles).Assembly);
 
 
 
