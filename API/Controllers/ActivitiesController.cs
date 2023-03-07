@@ -1,4 +1,9 @@
-﻿using Domain;
+﻿using Application.Activities.Commands.CreateActivity;
+using Application.Activities.Commands.EditActivity;
+using Application.Activities.Queries.DetailActivity;
+using Application.Activities.Queries.ListActivities;
+using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -7,21 +12,30 @@ namespace API.Controllers
 {
     public class ActivitiesController: BaseApiController
     {
-        private readonly DataContext _dataContext;
+        
 
-        public ActivitiesController(DataContext dataContext)
-        {
-            _dataContext = dataContext;
-        }
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> GetActivities()
         {
-            return await _dataContext.Activities.ToListAsync();
+            return await Mediator.Send(new ListActivitiesQuery.Query());
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Activity>> GetActivity(Guid id)
         {
-            return await _dataContext.Activities.FirstOrDefaultAsync(x=> x.Id == id);
+            return await Mediator.Send(new DetailActivityQuery.Query { Id = id});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateActivity(Activity activity)    
+        {
+            return Ok(await Mediator.Send(new CreateActivityCommand.Command { Activity = activity}));  
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditActivity(Guid id, Activity activity)
+        {
+            activity.Id = id;
+            return Ok(await Mediator.Send(new EditActivityCommand.Command { Activity = activity }));
         }
     }
 }
