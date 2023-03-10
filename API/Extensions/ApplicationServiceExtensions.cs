@@ -1,5 +1,9 @@
-﻿using Application.Activities.Queries.ListActivities;
+﻿using Application.Activities;
+using Application.Activities.Commands.CreateActivity;
+using Application.Activities.Queries.ListActivities;
 using Application.Core;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -24,6 +28,8 @@ namespace API.Extensions
             });
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ListActivitiesQuery).Assembly));
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<CreateActivityCommandValidator>();
             return services;
         }
     }

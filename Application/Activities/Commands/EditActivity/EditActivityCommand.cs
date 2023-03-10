@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Core;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Persistence;
@@ -12,13 +13,13 @@ namespace Application.Activities.Commands.EditActivity
 {
     public class EditActivityCommand
     {
-        public class Command : IRequest<Unit>
+        public class Command : IRequest<Result<Unit>>
         {
             
             public Activity Activity { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, Unit>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _dataContext;
             private readonly IMapper _mapper;
@@ -29,15 +30,22 @@ namespace Application.Activities.Commands.EditActivity
                 _mapper = mapper;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var activity = await _dataContext.Activities.FindAsync(request.Activity.Id);
-
+                if (activity == null)
+                {
+                    return null;
+                }
                 //activity.Title  = request.Activity.Title ?? activity.Title;
                 _mapper.Map(request.Activity, activity);
-                await _dataContext.SaveChangesAsync(cancellationToken);
+                var result = await _dataContext.SaveChangesAsync(cancellationToken) > 0;
+                if(!result)
+                {
+                    return Result<Unit>.Failure("Failed to edit the activity");
+                }
 
-                return Unit.Value;
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }
